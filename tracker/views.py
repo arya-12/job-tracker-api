@@ -26,6 +26,7 @@ class RegisterView(APIView):
         user.save()
         return Response({"message":"User created successfully"},
                         status=status.HTTP_201_CREATED)
+# test1
 # get all post
 class JobListView(APIView):
     permission_classes = [IsAuthenticated]
