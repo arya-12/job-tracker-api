@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+<div class="bg-white p-8 rounded shadow w-96">
+    <h1 class="text-2xl font-bold mb-6">Login</h1>
+
+    <input id="username" type="text" placeholder="Username"
+        class="w-full border p-2 rounded mb-4">
+
+    <input id="password" type="password" placeholder="Password"
+        class="w-full border p-2 rounded mb-4">
+
+    <button onclick="login()"
+        class="w-full bg-blue-500 text-white p-2 rounded mb-4">
+        Login
+    </button>
+
+    <p class="text-center">No account?
+        <a href="/register/" class="text-blue-500">Register</a>
+    </p>
+</div>
+
+<script>
+async function login() {
+    const username = document.getElementById('username').value
+    const password = document.getElementById('password').value
+
+    const response = await fetch('http://127.0.0.1:8000/api/login/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+    })
+
+    const data = await response.json()
+
+    if(response.ok) {
+        localStorage.setItem('token', data.access)
+        localStorage.setItem('refresh', data.refresh)
+        window.location.href = '/dashboard/'
+    } else {
+        alert('Wrong username or password!')
+    }
+}
+</script>
+
+</body>
+</html>

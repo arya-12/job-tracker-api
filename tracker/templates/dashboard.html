@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+
+<nav class="bg-blue-600 p-4 flex justify-between items-center">
+    <h1 class="text-white text-xl font-bold">Job Tracker</h1>
+    <div>
+        <a href="/add-job/" class="bg-white text-blue-600 px-4 py-2 rounded mr-4">Add Job</a>
+        <button onclick="logout()" class="text-white">Logout</button>
+    </div>
+</nav>
+
+<div class="p-8">
+    <h2 class="text-2xl font-bold mb-6">My Applications</h2>
+    <div id="jobs" class="space-y-4"></div>
+</div>
+
+<script>
+// Token check
+const token = localStorage.getItem('token')
+if(!token) {
+    window.location.href = '/'
+}
+
+// Refresh token function
+async function refreshToken() {
+    const refresh = localStorage.getItem('refresh')
+    const response = await fetch('http://127.0.0.1:8000/api/token/refresh/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh: refresh })
+    })
+    if(response.ok) {
+        const data = await response.json()
+        localStorage.setItem('token', data.access)
+        return data.access
+    } else {
+        logout()
+    }
+}
+
+// Jobs lao
+async function getJobs() {
+    let currentToken = localStorage.getItem('token')
+
+    let response = await fetch('http://127.0.0.1:8000/api/jobs/', {
+        headers: { 'Authorization': `Bearer ${currentToken}` }
+    })
+
+    // Token expire hua
+    if(response.status === 401) {
+        currentToken = await refreshToken()
+        response = await fetch('http://127.0.0.1:8000/api/jobs/', {
+            headers: { 'Authorization': `Bearer ${currentToken}` }
+        })
+    }
+
+    const data = await response.json()
+    const container = document.getElementById('jobs')
+    container.innerHTML = ''
+
+    data.forEach(job => {
+        container.innerHTML += `
+            <div class="bg-white p-4 rounded shadow flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-bold">${job.company_name}</h2>
+                    <p class="text-gray-600">${job.job_title}</p>
+                    <span class="text-green-500">${job.status}</span>
+                    <p class="text-gray-400 text-sm mt-1">${job.notes}</p>
+                </div>
+                <div>
+                    <button onclick="deleteJob(${job.id})"
+                        class="bg-red-500 text-white px-3 py-1 rounded">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        `
+    })
+}
+
+// Delete
+async function deleteJob(id) {
+    let currentToken = localStorage.getItem('token')
+    await fetch(`http://127.0.0.1:8000/api/jobs/${id}/`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${currentToken}` }
+    })
+    getJobs()
+}
+
+// Logout
+function logout() {
+    localStorage.removeItem('token')
+    localStorage.removeItem('refresh')
+    window.location.href = '/'
+}
+
+getJobs()
+</script>
+
+</body>
+</html>

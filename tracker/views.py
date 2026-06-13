@@ -65,5 +65,12 @@ class JobDetails(APIView):
         job.delete()
         return Response({"message":"Job application has been deleted successfully"},status=status.HTTP_204_NO_CONTENT)
 
-
+def register_page(request):
+    return render(request,'register.html')
+def login_page(request):
+    return render(request,'login.html')
+def dashboard_page(request):
+    return render(request,'dashboard.html')
+def add_job_page(request):
+    return render(request, 'add-job.html')
 

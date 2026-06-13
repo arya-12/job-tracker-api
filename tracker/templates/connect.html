@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+
+    <h1 class="text-3xl font-bold mb-6">My Job Applications</h1>
+
+    <div id="jobs" class="space-y-4"></div>
+
+<script>
+async function getJobs() {
+    const response = await fetch('http://127.0.0.1:8000/api/jobs/', {
+        headers: {
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzgxMzQ4NzMzLCJpYXQiOjE3ODEzNDg0MzMsImp0aSI6ImZjNTgxZWMyOGQ4MDRlZGU4ZmM3ZTgxYWUyMmRmY2U2IiwidXNlcl9pZCI6IjEifQ.7E0h4PHS9mBsGVuCwzSaEywS50-OkEFv-bUviNckvjU'
+        }
+    })
+    const data = await response.json()
+
+    const container = document.getElementById('jobs')
+    data.forEach(job => {
+        container.innerHTML += `
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-xl font-bold">${job.company_name}</h2>
+                <p class="text-gray-600">${job.job_title}</p>
+                <span class="text-green-500">${job.status}</span>
+            </div>
+        `
+    })
+}
+
+getJobs()
+</script>
+
+</body>
+</html>

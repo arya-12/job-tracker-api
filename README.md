@@ -1,12 +1,14 @@
-# Job Application Tracker API
+# Job Application Tracker
 
-A REST API to track job applications built with Django REST Framework.
+A Full Stack Job Application Tracker built with Django REST Framework backend and HTML/CSS/JS/Tailwind frontend.
 
 ## Features
-- JWT Authentication (Register/Login)
+- JWT Authentication (Register/Login/Logout)
+- Auto Refresh Token — user logged in rehta hai
 - Add, Edit, Delete job applications
 - Search by company name
 - Filter by status (Applied/Interview/Rejected/Hired)
+- Clean responsive UI with Tailwind CSS
 
 ## Tech Stack
 - Python
@@ -14,8 +16,18 @@ A REST API to track job applications built with Django REST Framework.
 - Django REST Framework
 - JWT Authentication
 - SQLite
+- HTML/CSS/JavaScript
+- Tailwind CSS
 
-[//]: # (API Endpoints)
+## Pages
+| Page | URL | Description |
+|------|-----|-------------|
+| Login | / | User login |
+| Register | /register/ | Naya user register |
+| Dashboard | /dashboard/ | Saari applications dekho |
+| Add Job | /add-job/ | Naya job add karo |
+
+## API Endpoints
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | /api/register/ | Register new user |
@@ -37,3 +49,5 @@ pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
 ```
+
+Visit `http://127.0.0.1:8000/` to open the app.
