@@ -1,54 +1,213 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | JobTracker</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #f3f4f6; overflow-x: hidden; }
+        .page { display: flex; min-height: 100vh; width: 100vw; }
+        .left { width: 55%; background: #1e1b4b; padding: 4.5rem; display: flex; flex-direction: column; justify-content: space-between; }
+        .right { width: 45%; background: white; padding: 4.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .form-container { width: 100%; max-width: 460px; }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo-icon { width: 38px; height: 38px; background: #818cf8; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+        .logo-text { color: white; font-size: 18px; font-weight: 600; }
+        .typing-container { display: flex; flex-direction: column-reverse; min-height: 160px; justify-content: flex-end; gap: 12px; }
+        .typing-row { font-size: 2.5rem; font-weight: 700; line-height: 1.25; color: #ffffff; transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1); opacity: 1; filter: blur(0px); transform: translateY(0); }
+        .typing-row.previous-line { color: #a5b4fc; opacity: 0.35; filter: blur(2.5px); font-size: 2rem; }
+        .typing-row.fade-out-line { opacity: 0; filter: blur(8px); transform: translateY(15px); height: 0; margin: 0; padding: 0; overflow: hidden; }
+        .typing-cursor { display: inline-block; width: 3px; background-color: #818cf8; margin-left: 6px; animation: blink 0.75s step-end infinite; }
+        @keyframes blink { from, to { background-color: transparent } 50% { background-color: #818cf8; } }
+        .hero-text p { color: #a5b4fc; font-size: 15px; line-height: 1.7; max-width: 500px; }
+        .features { display: flex; flex-direction: column; gap: 14px; }
+        .feature { display: flex; align-items: center; gap: 12px; }
+        .feature-dot { width: 7px; height: 7px; background: #818cf8; border-radius: 50%; flex-shrink: 0; }
+        .feature span { color: #c7d2fe; font-size: 14px; }
+        .badge { display: inline-block; background: rgba(129,140,248,0.15); color: #818cf8; font-size: 12px; padding: 4px 12px; border-radius: 100px; margin-bottom: 1.5rem; font-weight: 500; }
+        .form-title { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 6px; }
+        .form-sub { font-size: 14px; color: #6b7280; margin-bottom: 2.25rem; }
+        .field { margin-bottom: 1.5rem; }
+        .field label { display: block; font-size: 12px; font-weight: 600; color: #4b5563; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+        .field input { width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; background: #f9fafb; color: #111827; font-size: 14px; outline: none; transition: all 0.2s ease-in-out; }
+        .field input:focus { border-color: #4f46e5; background: white; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12); }
+        .btn-primary { width: 100%; padding: 12px; background: linear-gradient(90deg, #5b5fc7, #4d82e5); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 0.75rem; letter-spacing: 0.04em; transition: all 0.2s; box-shadow: 0 4px 14px rgba(77, 130, 229, 0.3); }
+        .btn-primary:hover { background: linear-gradient(90deg, #696dd9, #5da0f5); transform: translateY(-1px); }
+        .login-link { text-align: center; margin-top: 1.75rem; font-size: 14px; color: #6b7280; }
+        .login-link a { color: #4f46e5; text-decoration: none; font-weight: 600; }
+        .error-msg { color: #dc2626; font-size: 12px; margin-top: 6px; display: none; font-weight: 500; }
+        .success-msg { color: #10b981; font-size: 14px; font-weight: 600; text-align: center; margin-top: 12px; display: none; }
+    </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
+<body>
 
-<div class="bg-white p-8 rounded shadow w-96">
-    <h1 class="text-2xl font-bold mb-6">Register</h1>
+<div class="page">
+    <div class="left">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg width="20" height="20" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+            </div>
+            <span class="logo-text">JobTracker</span>
+        </div>
 
-    <input id="username" type="text" placeholder="Username"
-        class="w-full border p-2 rounded mb-4">
+        <div class="hero-text">
+            <div class="badge">Start your journey</div>
+            <div class="typing-container mb-6" id="typing-box"></div>
+            <p>Join thousands of job seekers who track their applications, follow-ups, and interviews in one place.</p>
+        </div>
 
-    <input id="email" type="email" placeholder="Email"
-        class="w-full border p-2 rounded mb-4">
+        <div class="features">
+            <div class="feature"><div class="feature-dot"></div><span>Free to use — no credit card needed</span></div>
+            <div class="feature"><div class="feature-dot"></div><span>Secure JWT authentication</span></div>
+            <div class="feature"><div class="feature-dot"></div><span>Track status: Applied → Interview → Hired</span></div>
+            <div class="feature"><div class="feature-dot"></div><span>Search and filter all applications</span></div>
+        </div>
+    </div>
 
-    <input id="password" type="password" placeholder="Password"
-        class="w-full border p-2 rounded mb-4">
+    <div class="right">
+        <div class="form-container">
+            <p class="form-title">Create your account</p>
+            <p class="form-sub">Fill in your details to get started</p>
 
-    <button onclick="register()"
-        class="w-full bg-green-500 text-white p-2 rounded mb-4">
-        Register
-    </button>
+            <div class="field">
+                <label>Username</label>
+                <input id="username" type="text" placeholder="e.g. arya12" />
+                <p class="error-msg" id="err-username">Username is required</p>
+            </div>
 
-    <p class="text-center">Already have an account?
-        <a href="login.html" class="text-blue-500">Login</a>
-    </p>
+            <div class="field">
+                <label>Email</label>
+                <input id="email" type="email" placeholder="arya@gmail.com" />
+                <p class="error-msg" id="err-email">Valid email is required</p>
+            </div>
+
+            <div class="field">
+                <label>Password</label>
+                <input id="password" type="password" placeholder="••••••••" />
+                <p class="error-msg" id="err-password">Password is required</p>
+            </div>
+
+            <button class="btn-primary" onclick="register()">Create Account</button>
+
+            <p class="success-msg" id="success-msg">✓ Account created successfully!</p>
+
+            <p class="login-link">Already have an account? <a href="/">Sign in</a></p>
+        </div>
+    </div>
 </div>
 
 <script>
-async function register() {
-    const username = document.getElementById('username').value
-    const email = document.getElementById('email').value
-    const password = document.getElementById('password').value
+const textLines = [
+    "Your job search,",
+    "organized and under control.",
+    "Kickstart your career,",
+    "track every application.",
+    "Land your dream job."
+]
 
-    const response = await fetch('http://127.0.0.1:8000/api/register/', {
+const typingBox = document.getElementById("typing-box")
+let currentLineIndex = 0
+let characterIndex = 0
+let currentElement = null
+let cursorSpan = null
+
+function startNextLine() {
+    if (currentLineIndex >= textLines.length) {
+        setTimeout(() => {
+            typingBox.innerHTML = ""
+            currentLineIndex = 0
+            currentElement = null
+            startNextLine()
+        }, 1500)
+        return
+    }
+    if (currentElement) {
+        if(cursorSpan) cursorSpan.remove()
+        currentElement.classList.add("previous-line")
+        const allLines = typingBox.getElementsByClassName("typing-row")
+        if (allLines.length > 2) {
+            allLines[0].classList.add("fade-out-line")
+        }
+    }
+    currentElement = document.createElement("div")
+    currentElement.className = "typing-row"
+    cursorSpan = document.createElement("span")
+    cursorSpan.className = "typing-cursor"
+    cursorSpan.innerHTML = "&nbsp;"
+    typingBox.appendChild(currentElement)
+    characterIndex = 0
+    typeLetters()
+}
+
+function typeLetters() {
+    const currentText = textLines[currentLineIndex]
+    if (characterIndex < currentText.length) {
+        currentElement.textContent = currentText.substring(0, characterIndex + 1)
+        currentElement.appendChild(cursorSpan)
+        characterIndex++
+        setTimeout(typeLetters, 55)
+    } else {
+        currentLineIndex++
+        setTimeout(startNextLine, 800)
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(startNextLine, 500)
+})
+
+async function register() {
+    const username = document.getElementById('username').value.trim()
+    const email = document.getElementById('email').value.trim()
+    const password = document.getElementById('password').value.trim()
+
+    document.getElementById('err-username').style.display = 'none'
+    document.getElementById('err-email').style.display = 'none'
+    document.getElementById('err-password').style.display = 'none'
+    document.getElementById('success-msg').style.display = 'none'
+
+    let hasError = false
+    if(!username) { document.getElementById('err-username').style.display = 'block'; hasError = true }
+    if(!email) { document.getElementById('err-email').style.display = 'block'; hasError = true }
+    if(!password) { document.getElementById('err-password').style.display = 'block'; hasError = true }
+    if(hasError) return
+
+try {
+    const response = await fetch('/api/register/', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password })
     })
 
-    const data = await response.json()
+    // ✅ Pehle text lo
+    const text = await response.text()
+
+    // ✅ Phir try karo JSON parse
+    let data
+    try {
+        data = JSON.parse(text)
+    } catch(e) {
+        // JSON nahi hai — but check karo status
+        if(response.ok) {
+            document.getElementById('success-msg').style.display = 'block'
+            setTimeout(() => { window.location.href = '/' }, 2000)
+            return
+        }
+    }
 
     if(response.ok) {
-        alert('Register successful! Please login.')
-        window.location.href = '/'
+        document.getElementById('success-msg').style.display = 'block'
+        setTimeout(() => { window.location.href = '/' }, 2000)
     } else {
         alert('Error: ' + JSON.stringify(data))
     }
+} catch(error) {
+    alert('Network error: ' + error.message)
+}
 }
 </script>
 

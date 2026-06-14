@@ -1,31 +1,105 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | JobTracker</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100">
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
 
-<nav class="bg-blue-600 p-4 flex justify-between items-center">
-    <h1 class="text-white text-xl font-bold">Job Tracker</h1>
-    <div>
-        <a href="/add-job/" class="bg-white text-blue-600 px-4 py-2 rounded mr-4">Add Job</a>
-        <button onclick="logout()" class="text-white">Logout</button>
+        /* Premium Header Styling */
+        .navbar {
+            background-color: #1e1b4b; /* Matching your login left-panel deep indigo */
+            border-bottom: 1px solid rgba(129, 140, 248, 0.2);
+        }
+
+        /* Image Matched Premium Gradient Button */
+        .btn-add {
+            background: linear-gradient(90deg, #5b5fc7, #4d82e5);
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 12px rgba(77, 130, 229, 0.25);
+        }
+        .btn-add:hover {
+            background: linear-gradient(90deg, #696dd9, #5da0f5);
+            box-shadow: 0 6px 16px rgba(77, 130, 229, 0.4);
+            transform: translateY(-1px);
+        }
+
+        /* Job Cards Smooth Interactions */
+        .job-card {
+            transition: all 0.25s ease-in-out;
+            border: 1px solid #e2e8f0;
+        }
+        .job-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(30, 27, 75, 0.04);
+            border-color: #cbd5e1;
+        }
+
+        /* Trash Button Glow */
+        .btn-delete {
+            transition: all 0.2s ease;
+            color: #94a3b8;
+        }
+        .btn-delete:hover {
+            color: #ef4444;
+            background-color: #fee2e2;
+        }
+    </style>
+</head>
+<body class="select-none">
+
+<nav class="navbar p-4 px-8 flex justify-between items-center sticky top-0 z-50 shadow-sm">
+    <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 bg-indigo-500 rounded-lg flex items-center justify-center shadow-md">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <rect x="5" y="5" width="14" height="14" rx="1.5"></rect>
+            </svg>
+        </div>
+        <span class="text-white text-lg font-bold tracking-wide">JobTracker</span>
+    </div>
+
+    <div class="flex items-center space-x-6">
+        <a href="/add-job/" class="btn-add text-white text-xs font-semibold px-4 py-2.5 rounded-lg tracking-wide">
+            + Add Job
+        </a>
+        <button onclick="logout()" class="text-gray-300 hover:text-white text-sm font-medium transition-colors">
+            Logout
+        </button>
     </div>
 </nav>
 
-<div class="p-8">
-    <h2 class="text-2xl font-bold mb-6">My Applications</h2>
-    <div id="jobs" class="space-y-4"></div>
+<div class="max-w-5xl mx-auto p-6 md:p-10">
+
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+        <div>
+            <h2 class="text-3xl font-bold text-gray-900 tracking-tight">My Applications</h2>
+            <p class="text-gray-500 text-sm mt-1">Track, manage, and monitor your submitted job applications.</p>
+        </div>
+
+        <div class="bg-white px-5 py-3 rounded-xl shadow-sm border border-gray-200 flex items-center space-x-3">
+            <div class="w-2.5 h-2.5 bg-indigo-500 rounded-full animate-pulse"></div>
+            <span class="text-gray-600 text-sm font-medium">Live Tracking Active</span>
+        </div>
+    </div>
+
+    <div id="jobs" class="space-y-4">
+        <p class="text-gray-400 text-sm animate-pulse">Fetching applications...</p>
+    </div>
 </div>
 
 <script>
-// Token check
+// Token check gateway
 const token = localStorage.getItem('token')
 if(!token) {
     window.location.href = '/'
 }
 
-// Refresh token function
+// Refresh token wrapper block
 async function refreshToken() {
     const refresh = localStorage.getItem('refresh')
     const response = await fetch('http://127.0.0.1:8000/api/token/refresh/', {
@@ -42,7 +116,21 @@ async function refreshToken() {
     }
 }
 
-// Jobs lao
+// Dynamic Status Badge Color Selector Module
+function getStatusBadgeClass(status) {
+    const normalized = status ? status.toLowerCase() : '';
+    if (normalized.includes('hire') || normalized.includes('accept')) {
+        return 'bg-green-100 text-green-700 border-green-200';
+    } else if (normalized.includes('interview')) {
+        return 'bg-blue-100 text-blue-700 border-blue-200';
+    } else if (normalized.includes('reject') || normalized.includes('decline')) {
+        return 'bg-rose-100 text-rose-700 border-rose-200';
+    } else {
+        return 'bg-amber-100 text-amber-700 border-amber-200'; // Default for Applied / Pending
+    }
+}
+
+// Fetch applications engine
 async function getJobs() {
     let currentToken = localStorage.getItem('token')
 
@@ -50,7 +138,7 @@ async function getJobs() {
         headers: { 'Authorization': `Bearer ${currentToken}` }
     })
 
-    // Token expire hua
+    // Auto Token Expire Handler Node
     if(response.status === 401) {
         currentToken = await refreshToken()
         response = await fetch('http://127.0.0.1:8000/api/jobs/', {
@@ -62,19 +150,36 @@ async function getJobs() {
     const container = document.getElementById('jobs')
     container.innerHTML = ''
 
+    if(data.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
+                <p class="text-gray-400 text-sm">No applications added yet. Click "+ Add Job" to start tracking!</p>
+            </div>
+        `;
+        return;
+    }
+
     data.forEach(job => {
+        const badgeClass = getStatusBadgeClass(job.status);
+
         container.innerHTML += `
-            <div class="bg-white p-4 rounded shadow flex justify-between items-center">
-                <div>
-                    <h2 class="text-xl font-bold">${job.company_name}</h2>
-                    <p class="text-gray-600">${job.job_title}</p>
-                    <span class="text-green-500">${job.status}</span>
-                    <p class="text-gray-400 text-sm mt-1">${job.notes}</p>
+            <div class="job-card bg-white p-5 rounded-xl flex justify-between items-center shadow-sm">
+                <div class="space-y-1.5">
+                    <div class="flex items-center space-x-3 flex-wrap gap-y-1">
+                        <h3 class="text-lg font-bold text-gray-800">${job.company_name}</h3>
+                        <span class="text-xs px-2.5 py-1 rounded-full font-semibold tracking-wide border ${badgeClass}">
+                            ${job.status}
+                        </span>
+                    </div>
+                    <p class="text-gray-500 font-medium text-sm">${job.job_title}</p>
+                    ${job.notes ? `<p class="text-gray-400 text-xs mt-2 bg-gray-50 p-2 rounded-md border border-gray-100 max-w-xl">${job.notes}</p>` : ''}
                 </div>
-                <div>
+                <div class="ml-4">
                     <button onclick="deleteJob(${job.id})"
-                        class="bg-red-500 text-white px-3 py-1 rounded">
-                        Delete
+                        class="btn-delete p-2 rounded-lg" title="Delete Application">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
                     </button>
                 </div>
             </div>
@@ -82,8 +187,10 @@ async function getJobs() {
     })
 }
 
-// Delete
+// Delete Operation Pipeline
 async function deleteJob(id) {
+    if(!confirm("Are you sure you want to delete this application?")) return;
+
     let currentToken = localStorage.getItem('token')
     await fetch(`http://127.0.0.1:8000/api/jobs/${id}/`, {
         method: 'DELETE',
@@ -92,13 +199,14 @@ async function deleteJob(id) {
     getJobs()
 }
 
-// Logout
+// Secure Clear Session Logout Gate
 function logout() {
     localStorage.removeItem('token')
     localStorage.removeItem('refresh')
     window.location.href = '/'
 }
 
+// Initial Boot Trigger
 getJobs()
 </script>
 

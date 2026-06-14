@@ -10,9 +10,11 @@ from .serializers import JobApplicationSerializers
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
+from rest_framework.authentication import SessionAuthentication
 # Create your views here.
 class RegisterView(APIView):
     permission_classes = []
+    authentication_classes = []
     def post(self,request):
         username=request.data.get('username')
         email=request.data.get('email')

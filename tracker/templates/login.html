@@ -1,50 +1,387 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobTracker | Sign In</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1c1a3b;
+            overflow: hidden;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        /* Split Screen Container layout */
+        .split-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Left side feature content styling */
+        .left-panel {
+            background-color: #1a1843;
+            width: 44%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-left: 5rem;
+            padding-right: 4rem;
+            position: relative;
+        }
+
+        /* Right side clean credentials action panel */
+        .right-panel {
+            background-color: #2b2b2a;
+            width: 56%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* --- Advanced Multi-line Typing Animation Deck --- */
+        .typing-container {
+            display: flex;
+            flex-direction: column-reverse; /* New line on top, old lines push down */
+            min-height: 160px;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .typing-row {
+            font-size: 2.25rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #ffffff;
+            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            opacity: 1;
+            filter: blur(0px);
+            transform: translateY(0);
+        }
+
+        /* When a line becomes old and moves down */
+        .typing-row.previous-line {
+            color: #a5b4fc;
+            opacity: 0.35;
+            filter: blur(2.5px);
+            font-size: 1.85rem; /* Slight scale down for 3D depth */
+        }
+
+        /* Completely fade out very old lines so the box doesn't overflow */
+        .typing-row.fade-out-line {
+            opacity: 0;
+            filter: blur(8px);
+            transform: translateY(15px);
+            height: 0;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        /* Typing Effect Terminal Cursor Style */
+        .typing-cursor {
+            display: inline-block;
+            width: 3px;
+            background-color: #6366f1;
+            margin-left: 6px;
+            animation: blink 0.75s step-end infinite;
+        }
+
+        @keyframes blink {
+            from, to { background-color: transparent }
+            50% { background-color: #6366f1; }
+        }
+
+        /* Form elements container size matching perfectly */
+        .form-box {
+            width: 440px;
+        }
+
+        /* Form Input Field Customization */
+        .custom-input {
+            background-color: #232322;
+            border: 1.5px solid #3d3d3c;
+            color: #ffffff;
+            transition: all 0.25s ease;
+        }
+        .custom-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            background-color: #1a1a19;
+            box-shadow: 0 0 12px rgba(79, 70, 229, 0.3);
+        }
+
+        /* Image matched Premium Blue Gradient Sign In Action Button */
+        #login-btn {
+            background: linear-gradient(90deg, #5b5fc7, #4d82e5);
+            border: none;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            white-space: nowrap;
+            box-shadow: 0 4px 14px rgba(77, 130, 229, 0.3);
+        }
+        #login-btn:hover {
+            background: linear-gradient(90deg, #696dd9, #5da0f5);
+            box-shadow: 0 6px 20px rgba(77, 130, 229, 0.45);
+            transform: translateY(-1px);
+        }
+    </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
+<body class="select-none">
 
-<div class="bg-white p-8 rounded shadow w-96">
-    <h1 class="text-2xl font-bold mb-6">Login</h1>
+    <div class="split-container">
 
-    <input id="username" type="text" placeholder="Username"
-        class="w-full border p-2 rounded mb-4">
+        <div class="left-panel">
+            <div class="flex items-center space-x-3 mb-10">
+                <div class="w-11 h-11 bg-indigo-500 rounded-xl flex items-center justify-center shadow-md">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <rect x="5" y="5" width="14" height="14" rx="1.5"></rect>
+                    </svg>
+                </div>
+                <span class="text-white text-xl font-bold tracking-wide">JobTracker</span>
+            </div>
 
-    <input id="password" type="password" placeholder="Password"
-        class="w-full border p-2 rounded mb-4">
+            <div class="inline-block mb-6">
+                <span class="bg-indigo-950 bg-opacity-40 text-indigo-400 text-xs px-3 py-1.5 rounded-full font-medium tracking-wide">
+                    Trusted by job seekers
+                </span>
+            </div>
 
-    <button onclick="login()"
-        class="w-full bg-blue-500 text-white p-2 rounded mb-4">
-        Login
-    </button>
+            <div class="typing-container mb-8" id="typing-box"></div>
 
-    <p class="text-center">No account?
-        <a href="/register/" class="text-blue-500">Register</a>
-    </p>
-</div>
+            <p class="text-indigo-200 text-sm opacity-80 leading-relaxed mb-10">
+                Stay organized, never miss a follow-up, and visualize your job search progress in one place.
+            </p>
+
+            <ul class="space-y-4 text-white text-sm">
+                <li class="flex items-start">
+                    <span class="text-indigo-400 mr-3 mt-1 text-xs">●</span>
+                    <span>JWT secured authentication</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-indigo-400 mr-3 mt-1 text-xs">●</span>
+                    <span>Track application status in real time</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-indigo-400 mr-3 mt-1 text-xs">●</span>
+                    <span>Search and filter your applications</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-indigo-400 mr-3 mt-1 text-xs">●</span>
+                    <span>Built with Django REST Framework</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="right-panel">
+            <div class="form-box">
+
+                <h2 class="text-white text-3xl font-semibold mb-2">Sign in to your account</h2>
+                <p class="text-gray-400 text-sm mb-8">Enter your credentials to continue</p>
+
+                <form onsubmit="return false;" class="space-y-5">
+                    <div>
+                        <label class="block text-gray-400 text-xs font-bold uppercase tracking-wider mb-2.5">Username</label>
+                        <input id="username" type="text" placeholder="e.g. arya12"
+                            class="w-full custom-input p-3 rounded-lg text-sm tracking-wide">
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-400 text-xs font-bold uppercase tracking-wider mb-2.5">Password</label>
+                        <input id="password" type="password" placeholder="••••••••"
+                            class="w-full custom-input p-3 rounded-lg text-sm tracking-wide">
+                    </div>
+
+                    <div class="pt-4 h-14 relative">
+                        <button id="login-btn" onmouseenter="validateWithBackend()" onclick="login()"
+                            class="w-full text-white font-medium p-3 rounded-lg text-sm tracking-wide shadow-lg">
+                            Sign in
+                        </button>
+                    </div>
+                </form>
+
+                <p class="text-center text-xs text-gray-400 mt-8">
+                    Don't have an account?
+                    <a href="/register/" class="text-blue-500 hover:underline ml-1">Create one</a>
+                </p>
+
+            </div>
+        </div>
+
+    </div>
 
 <script>
+// --- Multi-Line Sequence-Typing with Push down Blur Engine ---
+const textLines = [
+    "Track every application,",
+    "land your dream job.",
+    "Manage interviews easily,",
+    "never miss a follow-up.",
+    "Achieve your career goals."
+];
+
+const typingBox = document.getElementById("typing-box");
+let currentLineIndex = 0;
+let characterIndex = 0;
+let currentElement = null;
+let cursorSpan = null;
+
+function startNextLine() {
+    if (currentLineIndex >= textLines.length) {
+        setTimeout(() => {
+            typingBox.innerHTML = "";
+            currentLineIndex = 0;
+            currentElement = null;
+            startNextLine();
+        }, 1500);
+        return;
+    }
+
+    if (currentElement) {
+        if(cursorSpan) cursorSpan.remove();
+        currentElement.classList.add("previous-line");
+
+        const allLines = typingBox.getElementsByClassName("typing-row");
+        if (allLines.length > 2) {
+            allLines[0].classList.add("fade-out-line");
+        }
+    }
+
+    currentElement = document.createElement("div");
+    currentElement.className = "typing-row";
+
+    cursorSpan = document.createElement("span");
+    cursorSpan.className = "typing-cursor";
+    cursorSpan.innerHTML = "&nbsp;";
+
+    typingBox.appendChild(currentElement);
+    characterIndex = 0;
+    typeLetters();
+}
+
+function typeLetters() {
+    const currentText = textLines[currentLineIndex];
+
+    if (characterIndex < currentText.length) {
+        currentElement.textContent = currentText.substring(0, characterIndex + 1);
+        currentElement.appendChild(cursorSpan);
+        characterIndex++;
+        setTimeout(typeLetters, 55);
+    } else {
+        currentLineIndex++;
+        setTimeout(startNextLine, 800);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(startNextLine, 500);
+});
+
+let isFormInvalid = false;
+let lastCheckedUser = "";
+let lastCheckedPass = "";
+const loginBtn = document.getElementById('login-btn');
+
+// --- Live Validation Matrix Interface ---
+async function validateWithBackend() {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    if (!username || !password) return;
+
+    if (username === lastCheckedUser && password === lastCheckedPass) {
+        if (isFormInvalid) moveButtonControlled();
+        return;
+    }
+
+    lastCheckedUser = username;
+    lastCheckedPass = password;
+
+    try {
+        const response = await fetch('http://127.0.0.1:8000/api/login/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+
+        if (response.ok) {
+            resetButton();
+        } else {
+            triggerWrongDetails();
+        }
+    } catch (error) {
+        if (username === "admin" && password === "123") {
+            resetButton();
+        } else {
+            triggerWrongDetails();
+        }
+    }
+}
+
+function triggerWrongDetails() {
+    isFormInvalid = true;
+    loginBtn.innerText = "Wrong Details! ❌";
+    loginBtn.style.position = 'absolute';
+    loginBtn.style.width = '180px';
+    loginBtn.style.zIndex = '999';
+    loginBtn.style.background = "linear-gradient(90deg, #f43f5e, #e11d48)";
+    loginBtn.style.boxShadow = "0 0 20px rgba(225, 29, 72, 0.6)";
+    moveButtonControlled();
+}
+
+document.addEventListener('mousemove', (e) => {
+    if (!isFormInvalid) return;
+
+    const btnRect = loginBtn.getBoundingClientRect();
+    const btnCenterX = btnRect.left + btnRect.width / 2;
+    const btnCenterY = btnRect.top + btnRect.height / 2;
+    const distance = Math.hypot(e.clientX - btnCenterX, e.clientY - btnCenterY);
+
+    if (distance < 75) {
+        moveButtonControlled();
+    }
+});
+
+function moveButtonControlled() {
+    const randomX = (Math.random() - 0.5) * 220;
+    const randomY = (Math.random() - 0.5) * 180;
+    loginBtn.style.transform = `translate(${randomX}px, ${randomY}px)`;
+}
+
+function resetButton() {
+    isFormInvalid = false;
+    loginBtn.innerText = "Sign in";
+    loginBtn.style.position = 'relative';
+    loginBtn.style.width = '100%';
+    loginBtn.style.transform = 'translate(0px, 0px)';
+    loginBtn.style.background = "linear-gradient(90deg, #5b5fc7, #4d82e5)";
+    loginBtn.style.boxShadow = "0 4px 14px rgba(77, 130, 229, 0.3)";
+}
+
+document.getElementById('username').addEventListener('input', () => { isFormInvalid = false; resetButton(); });
+document.getElementById('password').addEventListener('input', () => { isFormInvalid = false; resetButton(); });
+
+// --- Final Auth Gateway Handlers ---
 async function login() {
-    const username = document.getElementById('username').value
-    const password = document.getElementById('password').value
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
 
     const response = await fetch('http://127.0.0.1:8000/api/login/', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
-    })
+    });
 
-    const data = await response.json()
+    const data = await response.json();
 
     if(response.ok) {
-        localStorage.setItem('token', data.access)
-        localStorage.setItem('refresh', data.refresh)
-        window.location.href = '/dashboard/'
+        localStorage.setItem('token', data.access);
+        localStorage.setItem('refresh', data.refresh);
+        window.location.href = '/dashboard/';
     } else {
-        alert('Wrong username or password!')
+        alert('Wrong username or password!');
     }
 }
 </script>
